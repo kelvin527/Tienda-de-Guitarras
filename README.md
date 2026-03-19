@@ -1,6 +1,20 @@
 # 🎸 GuitarLA - Tienda de Guitarras
 
-Aplicación web de comercio electrónico para la venta de guitarras, construida con **React + Vite**. Permite a los usuarios explorar el catálogo, agregar productos al carrito, y gestionar las cantidades, con persistencia en `localStorage`.
+Aplicación web de comercio electrónico para la venta de guitarras. El proyecto fue desarrollado para practicar el manejo de estado global en React, custom hooks, y persistencia con `localStorage`.
+
+🔗 **[Ver demo en vivo](https://tiendaguitarr.netlify.app)**
+
+---
+
+## ✨ Funcionalidades
+
+- Catálogo de 12 guitarras con nombre, descripción y precio
+- Carrito de compras con dropdown al hover
+- Agregar productos al carrito (incrementa la cantidad si ya existe)
+- Incrementar / decrementar / eliminar ítems individuales
+- Vaciar el carrito completo
+- Total calculado en tiempo real
+- **Persistencia del carrito** — sobrevive recargas de página gracias a `localStorage`
 
 ---
 
@@ -8,8 +22,24 @@ Aplicación web de comercio electrónico para la venta de guitarras, construida 
 
 - [React 18](https://react.dev/)
 - [Vite 5](https://vitejs.dev/)
-- CSS personalizado (Bootstrap 5 embebido en `index.css`)
+- CSS personalizado con Bootstrap 5 embebido
 - Google Fonts — [Outfit](https://fonts.google.com/specimen/Outfit)
+
+---
+
+## 🧠 Decisiones técnicas
+
+**Custom hook `useCart`**  
+Toda la lógica del carrito fue extraída a un hook personalizado para mantener `App.jsx` limpio y separar responsabilidades. El hook expone únicamente las funciones y el estado necesarios, sin acoplar la lógica al componente visual.
+
+**`useMemo` para `isEmpy`**  
+La verificación de carrito vacío está memoizada con `useMemo` para evitar que React recalcule ese valor en cada render cuando el carrito no ha cambiado.
+
+**Inicialización lazy del estado**  
+`useState(initialCart)` recibe una función en lugar de un valor directo, lo que hace que `localStorage` se lea solo una vez al montar el componente, y no en cada render.
+
+**`useEffect` para sincronizar con `localStorage`**  
+Cada vez que el array `car` cambia, un efecto serializa el estado y lo persiste. Esto desacopla la sincronización de la lógica de negocio.
 
 ---
 
@@ -18,7 +48,7 @@ Aplicación web de comercio electrónico para la venta de guitarras, construida 
 ```
 guitar02/
 ├── public/
-│   └── img/              # Logo, imagen del carrito, header e imágenes de guitarras
+│   └── img/              # Logo, carrito, header e imágenes de guitarras
 ├── src/
 │   ├── components/
 │   │   ├── Guitar.jsx    # Tarjeta de producto individual
@@ -27,10 +57,9 @@ guitar02/
 │   │   └── db.js         # Catálogo de 12 guitarras (datos estáticos)
 │   ├── hooks/
 │   │   └── useCart.js    # Custom hook con toda la lógica del carrito
-│   ├── App.jsx           # Componente raíz
-│   ├── App.css           # Estilos adicionales de la app
+│   ├── App.jsx
 │   ├── index.css         # Estilos globales + Bootstrap embebido
-│   └── main.jsx          # Punto de entrada de React
+│   └── main.jsx
 ├── index.html
 ├── vite.config.js
 └── package.json
@@ -41,75 +70,10 @@ guitar02/
 ## ⚙️ Instalación y uso
 
 ```bash
-# 1. Clonar el repositorio
 git clone https://github.com/tu-usuario/Tienda-de-Guitarras.git
 cd guitar02
-
-# 2. Instalar dependencias
 npm install
-
-# 3. Iniciar servidor de desarrollo
 npm run dev
-
-# 4. Build para producción
-npm run build
-
-# 5. Previsualizar el build
-npm run preview
-```
-
----
-
-## 🧩 Componentes
-
-### `App.jsx`
-Componente raíz. Consume el hook `useCart` y distribuye las funciones y el estado a `Header` y `Guitar`.
-
-### `Header.jsx`
-Muestra el logo y el carrito de compras. El carrito es un dropdown que aparece al hacer hover. Incluye:
-- Tabla con los productos agregados (imagen, nombre, precio, cantidad)
-- Botones para incrementar / decrementar / eliminar cada ítem
-- Total a pagar calculado dinámicamente
-- Botón para vaciar el carrito
-- Mensaje de "carrito vacío" cuando no hay ítems
-
-### `Guitar.jsx`
-Tarjeta de producto que muestra imagen, nombre, descripción y precio. Incluye el botón **Agregar al Carrito** que llama a `addCart`.
-
----
-
-## 🪝 Hook: `useCart`
-
-Centraliza toda la lógica de estado del carrito en `src/hooks/useCart.js`.
-
-| Función / Estado | Descripción |
-|---|---|
-| `data` | Catálogo completo de guitarras (de `db.js`) |
-| `car` | Array de productos en el carrito |
-| `addCart(guitar)` | Agrega un ítem o incrementa su cantidad si ya existe |
-| `removeFromCart(id)` | Elimina un ítem del carrito por su `id` |
-| `incrementCart(id)` | Incrementa en 1 la cantidad de un ítem |
-| `decrementCart(id)` | Decrementa en 1 la cantidad (mínimo 0) |
-| `clearCart()` | Vacía el carrito completamente |
-| `carTotal()` | Retorna el total calculado (`quantity * price`) |
-| `isEmpy` | `boolean` — `true` si el carrito está vacío (memoizado con `useMemo`) |
-
-**Persistencia:** el carrito se guarda automáticamente en `localStorage` mediante un `useEffect` que se dispara cada vez que `car` cambia. Al cargar la app, el estado inicial se recupera desde `localStorage`.
-
----
-
-## 📦 Datos del catálogo
-
-El archivo `src/data/db.js` exporta un array de 12 guitarras con la siguiente estructura:
-
-```js
-{
-  id: 1,
-  name: 'Lukather',
-  image: 'guitarra_01',   // resuelve a public/img/guitarra_01.jpg
-  description: '...',
-  price: 299
-}
 ```
 
 ---
